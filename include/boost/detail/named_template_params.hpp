@@ -4,31 +4,90 @@
 // "as is" without express or implied warranty, and with no claim as
 // to its suitability for any purpose.
 
+// Revision History:
+//
+// 27 June 2001  Jeremy Siek
+//      Simplified the mechanism.
+// 08 Mar 2001   Jeremy Siek
+//      Initial version.
+
 #ifndef BOOST_DETAIL_NAMED_TEMPLATE_PARAMS_HPP
 #define BOOST_DETAIL_NAMED_TEMPLATE_PARAMS_HPP
 
 #include <boost/type_traits/conversion_traits.hpp>
+#include <boost/type_traits/same_traits.hpp>
 #include <boost/type_traits/composite_traits.hpp> // for is_reference
+#include <boost/pending/ct_if.hpp>
 #if defined(__BORLANDC__)
 #include <boost/type_traits/ice.hpp>
 #endif
 
+/* 
+   template <class List, class Tag>
+   struct find_param;
+   
+   This searches through a compile-time associative "List" of types
+   to find the value (which is a type) associated with key specified
+   by "Tag". The list is a lisp-style cons list using std::pair.
+   The first_type of each pair must be a type that has a
+   "type" and "tag" member, where "type" is the value and "tag"
+   is the key that will match with the "Tag". The *_is classes
+   in boost/iterator_adaptors.hpp (like value_type_is) are
+   example of such types.
+   
+
+   struct named_template_param_base;
+   template <class Arg, class Tag> struct wrap_param;
+
+   The named_template_param_base can be used to distinguish
+   normal arguments from named arguments, the *_is classes
+   inherit from named_template_param_base. The wrap_param
+   class returns named arguments unchanged and returns
+   normal arguments wrapped with the param_is type so
+   that it will fit into the associative list.
+
+   
+   template <class Arg, class DefaultGen, class Info>
+   class resolve_default;
+   
+   This class figures out what the argument type of a parameter is
+   based on the argument passed in (which might be the
+   default_argument type), a default generator, and an Info type,
+
+   The DefaultGen type should have a single member class template
+   named "bind" with one template parameter for the Info type. The
+   bind class should have a single typedef named "type" that produces
+   the default. See boost/iterator_adaptors.hpp for example usage.
+
+  The Info type is any type that might be useful in computing the
+  default inside of the "bind" member class.
+
+*/
+
+
 namespace boost {
+
+  // To differentiate an unnamed parameter from a traits generator
+  // we use is_convertible<X, iter_traits_gen_base>.
+  struct named_template_param_base { };
+
   namespace detail {
     
     struct default_argument { };
 
     struct dummy_default_gen {
-      template <class Base, class Traits>
+      template <class Info>
       struct bind {
         typedef default_argument type;
       };
     };
 
-   // This class template is a workaround for MSVC.
-   template <class Gen> struct default_generator {
-     typedef detail::dummy_default_gen type;
-   };
+    // Specializations of this class template are used as a workaround
+    // for MSVC. For other compilers this unspecialized version is
+    // used (which doesn't really do anything).
+    template <class Gen> struct default_generator {
+      typedef Gen type;
+    };
 
     template <class T> struct is_default { 
       enum { value = false };  
@@ -40,14 +99,14 @@ namespace boost {
     };
 
     struct choose_default {
-      template <class Arg, class DefaultGen, class Base, class Traits>
+      template <class Arg, class DefaultGen, class Info>
       struct bind {
         typedef typename default_generator<DefaultGen>::type Gen;
-        typedef typename Gen::template bind<Base,Traits>::type type;
+        typedef typename Gen::template bind<Info>::type type;
       };
     };
     struct choose_arg {
-      template <class Arg, class DefaultGen, class Base, class Traits>
+      template <class Arg, class DefaultGen, class Info>
       struct bind {
         typedef Arg type;
       };
@@ -69,7 +128,7 @@ namespace boost {
     };
 #endif
     
-    template <class Arg, class DefaultGen, class Base, class Traits>
+    template <class Arg, class DefaultGen, class Info>
     class resolve_default {
 #if defined(__BORLANDC__)
       typedef typename choose_arg_or_default<typename is_default<Arg>::type>::type Selector;
@@ -81,12 +140,8 @@ namespace boost {
 #endif
     public:
       typedef typename Selector
-        ::template bind<Arg, DefaultGen, Base, Traits>::type type;
+        ::template bind<Arg, DefaultGen, Info>::type type;
     };
-
-    // To differentiate an unnamed parameter from a traits generator
-    // we use is_convertible<X, iter_traits_gen_base>.
-    struct named_template_param_base { };
 
     template <class X>
     struct is_named_param_list {
@@ -118,54 +173,52 @@ namespace boost {
       typedef typename Selector::template bind<PreviousArg>::type type;
     };
 
-    // This macro assumes that there is a class named default_##TYPE
-    // defined before the application of the macro.  This class should
-    // have a single member class template named "bind" with two
-    // template parameters: the type of the class being created (e.g.,
-    // the iterator_adaptor type when creating iterator adaptors) and
-    // a traits class. The bind class should have a single typedef
-    // named "type" that produces the default for TYPE.  See
-    // boost/iterator_adaptors.hpp for an example usage.  Also,
-    // applications of this macro must be placed in namespace
-    // boost::detail.
-
-#define BOOST_NAMED_TEMPLATE_PARAM(TYPE) \
-    struct get_##TYPE##_from_named { \
-      template <class Base, class NamedParams, class Traits> \
-      struct bind { \
-          typedef typename NamedParams::traits NamedTraits; \
-          typedef typename NamedTraits::TYPE TYPE; \
-          typedef typename resolve_default<TYPE, \
-            default_##TYPE, Base, NamedTraits>::type type; \
-      }; \
-    }; \
-    struct pass_thru_##TYPE { \
-      template <class Base, class Arg, class Traits> struct bind { \
-          typedef typename resolve_default<Arg, \
-            default_##TYPE, Base, Traits>::type type; \
-      };\
-    }; \
-    template <int NamedParam> \
-    struct get_##TYPE##_dispatch { }; \
-    template <> struct get_##TYPE##_dispatch<1> { \
-      typedef get_##TYPE##_from_named type; \
-    }; \
-    template <> struct get_##TYPE##_dispatch<0> { \
-      typedef pass_thru_##TYPE type; \
-    }; \
-    template <class Base, class X, class Traits>  \
-    class get_##TYPE { \
-      enum { is_named = is_named_param_list<X>::value }; \
-      typedef typename get_##TYPE##_dispatch<is_named>::type Selector; \
-    public: \
-      typedef typename Selector::template bind<Base, X, Traits>::type type; \
-    }; \
-    template <> struct default_generator<default_##TYPE> { \
-      typedef default_##TYPE type; \
-    }
-
-    
   } // namespace detail
+
+  struct list_end_type { };
+
+  namespace detail {
+    template <class List> 
+    struct find_param_impl {
+      template <class Tag> class bind {
+        typedef typename List::first_type Param;
+        typedef typename List::second_type Rest;
+        typedef typename find_param_impl<Rest>::template bind<Tag>::type 
+          RestType;
+        enum { is_same_tag = is_same<typename Param::tag, Tag>::value };
+      public:
+        typedef typename ct_if<is_same_tag,
+          typename Param::type, RestType>::type type;
+      };
+    };
+    template <> 
+    struct find_param_impl<list_end_type> {
+      template <class Tag> struct bind {
+        typedef default_argument type;
+      };
+    };
+
+    template <class T, class Tag>
+    struct param_is {
+      typedef T type;
+      typedef Tag tag;
+    };
+
+  } //namespace detail
+
+  template <class List, class Tag> struct find_param {
+    typedef typename detail::find_param_impl<List>::template bind<Tag>::type 
+      type;
+  };
+
+  template <class T, class Tag>
+  struct wrap_param {
+    enum { is_named_param = 
+           is_convertible<T, named_template_param_base>::value };
+    typedef typename ct_if<is_named_param, T, 
+      detail::param_is<T, Tag> >::type type;
+  };
+
 } // namespace boost
 
 #endif // BOOST_DETAIL_NAMED_TEMPLATE_PARAMS_HPP
