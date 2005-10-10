@@ -9,60 +9,7 @@
 # include <boost/type_traits/remove_cv.hpp>
 # include <boost/mpl/aux_/lambda_support.hpp>
 # include <boost/mpl/bool.hpp>
-# include <boost/config.hpp>  // BOOST_INTEL
 # include <boost/detail/workaround.hpp>
-
-# if defined(__GNUC_PATCHLEVEL__) && !defined(BOOST_INTEL)
-#  define BOOST_IS_INCREMENTABLE_GCC \
-     ((__GNUC__ * 100UL + __GNUC_MINOR__) * 100UL + __GNUC_PATCHLEVEL__) \
-     /**/
-# else
-#  define BOOST_IS_INCREMENTABLE_GCC 0
-# endif
-
-# if BOOST_WORKAROUND(BOOST_IS_INCREMENTABLE_GCC, >= 40002)
-
-namespace boost { namespace detail { namespace is_incrementable_ {
-
-    // A type returned from operator++ when no increment is found in the
-    // type's own namespace
-    struct tag {};
-
-    // In case an operator++ is found that returns void, we'll use ++x,0
-    tag operator,(tag,int);  
-
-    // Two check overloads help us identify which operator++ was picked
-    char (& check(tag) )[2];
-
-    template <class T>
-    char check(T const&);
-
-    template<typename T>
-    struct impl {
-        template<typename U>
-        friend tag operator++(const U&);
-        template<typename U>
-        friend tag operator++(const U&, int);
-        static typename boost::remove_cv<T>::type& x;
-        static const bool is_incrementable = 
-            sizeof(is_incrementable_::check((++x,0))) == 1;
-        static const bool is_postfix_incrementable = 
-            sizeof(is_incrementable_::check((x++,0))) == 1;
-    };
-
-} // namespace is_incrementable_
-
-template< typename T, 
-          typename B = typename is_incrementable_::template impl<T> >
-struct is_incrementable : mpl::bool_<B::is_incrementable> { };
-
-template< typename T, 
-          typename B = typename is_incrementable_::template impl<T> >
-struct is_postfix_incrementable : mpl::bool_<B::is_postfix_incrementable> { };
-
-} } // namespace boost::detail
-
-# else
 
 namespace boost { namespace detail { 
 
@@ -152,6 +99,5 @@ BOOST_TT_AUX_TEMPLATE_ARITY_SPEC(1, ::boost::detail::is_postfix_incrementable)
 
 } // namespace boost
 
-# endif // # if BOOST_WORKAROUND(BOOST_IS_INCREMENTABLE_GCC, >= 40002)
 
 #endif // IS_INCREMENTABLE_DWA200415_HPP
