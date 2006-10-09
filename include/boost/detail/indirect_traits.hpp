@@ -408,7 +408,7 @@ struct is_reference_to_pointer
 
 template <class T>
 struct is_reference_to_function_pointer
-y  : mpl::eval_if<is_reference<T>, is_pointer_to_function_aux<T>, mpl::false_>::type
+  : mpl::eval_if<is_reference<T>, is_pointer_to_function_aux<T>, mpl::false_>::type
 {
     BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_reference_to_function_pointer,(T))
 };
