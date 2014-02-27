@@ -7,7 +7,7 @@
 #define BOOST_UTF8_CODECVT_FACET_HPP
 
 // MS compatible compilers support #pragma once
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
 #endif
 
@@ -85,10 +85,6 @@
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 
-#ifndef BOOST_NO_CXX11_HDR_CODECVT
-#include <codecvt>
-#endif
-
 #if defined(BOOST_NO_STDC_NAMESPACE)
 namespace std {
     using ::mbstate_t;
@@ -96,6 +92,19 @@ namespace std {
 }
 #endif
 
+#if !defined(__MSL_CPP__) && !defined(__LIBCOMO__)
+    #define BOOST_CODECVT_DO_LENGTH_CONST const
+#else
+    #define BOOST_CODECVT_DO_LENGTH_CONST
+#endif
+
+#if ! defined(BOOST_NO_CXX11_NOEXCEPT)
+    #define BOOST_CODECVT_NOEXCEPT noexcept
+#else
+    #define BOOST_CODECVT_NOEXCEPT throw()
+#endif
+
+// maximum lenght of a multibyte string
 #define MB_LENGTH_MAX 8
 
 BOOST_UTF8_BEGIN_NAMESPACE
@@ -119,9 +128,13 @@ protected:
     ) const;
 
     virtual std::codecvt_base::result do_out(
-        std::mbstate_t & state, const wchar_t * from,
-        const wchar_t * from_end, const wchar_t*  & from_next,
-        char * to, char * to_end, char * & to_next
+        std::mbstate_t & state,
+        const wchar_t * from,
+        const wchar_t * from_end,
+        const wchar_t*  & from_next,
+        char * to,
+        char * to_end,
+        char * & to_next
     ) const;
 
     bool invalid_continuing_octet(unsigned char octet_1) const {
@@ -144,7 +157,9 @@ protected:
     // ==   total octets - 1.
     int get_cont_octet_out_count(wchar_t word) const ;
 
-    virtual bool do_always_noconv() const throw() { return false; }
+    virtual bool do_always_noconv() const BOOST_CODECVT_NOEXCEPT {
+        return false;
+    }
 
     // UTF-8 isn't really stateful since we rewind on partial conversions
     virtual std::codecvt_base::result do_unshift(
@@ -152,49 +167,30 @@ protected:
         char * from,
         char * /*to*/,
         char * & next
-    ) const 
-    {
+    ) const {
         next = from;
         return ok;
     }
 
-    virtual int do_encoding() const throw() {
+    virtual int do_encoding() const BOOST_CODECVT_NOEXCEPT {
         const int variable_byte_external_encoding=0;
         return variable_byte_external_encoding;
     }
 
     // How many char objects can I process to get <= max_limit
-    // wchar_t objects? 
-    // This is the "official version which implements the standar
-    // library interface
+    // wchar_t objects?
     virtual int do_length(
-        std::mbstate_t & state,
-        const char * from,
-        const char * from_end, 
-        std::size_t max_limit
-    ) const
-    #if BOOST_WORKAROUND(__IBMCPP__, BOOST_TESTED_AT(600))
-        throw()
-    #endif
-    {
-        return do_length(const_cast<const std::mbstate_t &>(state), from, from_end, max_limit);
-    }
-
-    // this version handles versions of the standard library which pass
-    // the state with a "const". This means early dinkumware standard library
-    virtual int do_length(
-        const std::mbstate_t & state,
+        BOOST_CODECVT_DO_LENGTH_CONST std::mbstate_t &,
         const char * from,
         const char * from_end, 
         std::size_t max_limit
     ) const;
 
     // Largest possible value do_length(state,from,from_end,1) could return.
-    virtual int do_max_length() const throw () {
+    virtual int do_max_length() const BOOST_CODECVT_NOEXCEPT {
         return 6; // largest UTF-8 encoding of a UCS-4 character
     }
 };
-
 
 BOOST_UTF8_END_NAMESPACE
 
