@@ -98,12 +98,6 @@ namespace std {
     #define BOOST_CODECVT_DO_LENGTH_CONST
 #endif
 
-#if ! defined(BOOST_NO_CXX11_NOEXCEPT)
-    #define BOOST_CODECVT_NOEXCEPT noexcept
-#else
-    #define BOOST_CODECVT_NOEXCEPT throw()
-#endif
-
 // maximum lenght of a multibyte string
 #define MB_LENGTH_MAX 8
 
@@ -157,7 +151,7 @@ protected:
     // ==   total octets - 1.
     int get_cont_octet_out_count(wchar_t word) const ;
 
-    virtual bool do_always_noconv() const BOOST_CODECVT_NOEXCEPT {
+    virtual bool do_always_noconv() const BOOST_NOEXCEPT {
         return false;
     }
 
@@ -172,7 +166,7 @@ protected:
         return ok;
     }
 
-    virtual int do_encoding() const BOOST_CODECVT_NOEXCEPT {
+    virtual int do_encoding() const BOOST_NOEXCEPT {
         const int variable_byte_external_encoding=0;
         return variable_byte_external_encoding;
     }
@@ -187,7 +181,7 @@ protected:
     ) const;
 
     // Largest possible value do_length(state,from,from_end,1) could return.
-    virtual int do_max_length() const BOOST_CODECVT_NOEXCEPT {
+    virtual int do_max_length() const BOOST_NOEXCEPT {
         return 6; // largest UTF-8 encoding of a UCS-4 character
     }
 };
