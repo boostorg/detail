@@ -141,17 +141,17 @@ protected:
     }
 
     // continuing octets = octets except for the leading octet
-    static unsigned int get_cont_octet_count(unsigned   char lead_octet) {
+    static unsigned int get_cont_octet_count(unsigned char lead_octet) {
         return get_octet_count(lead_octet) - 1;
     }
 
-    static unsigned int get_octet_count(unsigned char   lead_octet);
+    static unsigned int get_octet_count(unsigned char lead_octet);
 
     // How many "continuing octets" will be needed for this word
     // ==   total octets - 1.
     int get_cont_octet_out_count(wchar_t word) const ;
 
-    virtual bool do_always_noconv() const BOOST_NOEXCEPT {
+    virtual bool do_always_noconv() const BOOST_NOEXCEPT_OR_NOTHROW {
         return false;
     }
 
@@ -166,7 +166,7 @@ protected:
         return ok;
     }
 
-    virtual int do_encoding() const BOOST_NOEXCEPT {
+    virtual int do_encoding() const BOOST_NOEXCEPT_OR_NOTHROW {
         const int variable_byte_external_encoding=0;
         return variable_byte_external_encoding;
     }
@@ -181,7 +181,7 @@ protected:
     ) const;
 
     // Largest possible value do_length(state,from,from_end,1) could return.
-    virtual int do_max_length() const BOOST_NOEXCEPT {
+    virtual int do_max_length() const BOOST_NOEXCEPT_OR_NOTHROW {
         return 6; // largest UTF-8 encoding of a UCS-4 character
     }
 };
