@@ -92,8 +92,10 @@ int main (void) {
   BOOST_TEST_EQ(IS_SORTED_UNTIL(a.begin(), a.end()),          a.end());
   BOOST_TEST_EQ(IS_SORTED_UNTIL(a.begin(), a.end(), lt),      a.end());
   BOOST_TEST_EQ(IS_SORTED_UNTIL(a.begin(), a.end(), lte),     a.end());
-  BOOST_TEST_EQ(*IS_SORTED_UNTIL(a.rbegin(), a.rend(), gt),   *a.rend());
-  BOOST_TEST_EQ(*IS_SORTED_UNTIL(a.rbegin(), a.rend(), gte),  *a.rend());
+  BOOST_TEST_EQ(IS_SORTED_UNTIL(a.rbegin(), a.rend(), gt).base(),
+          a.rend().base());
+  BOOST_TEST_EQ(IS_SORTED_UNTIL(a.rbegin(), a.rend(), gte).base(),
+          a.rend().base());
   
   BOOST_TEST_EQ(IS_SORTED(a.begin(), a.end()),        true);
   BOOST_TEST_EQ(IS_SORTED(a.begin(), a.end(), lt),    true);
@@ -104,7 +106,8 @@ int main (void) {
   BOOST_TEST_EQ(IS_SORTED_UNTIL(b.begin(), b.end()),          b.end());
   BOOST_TEST_EQ(IS_SORTED_UNTIL(b.begin(), b.end(), lt),      b.end());
   BOOST_TEST_EQ(IS_SORTED_UNTIL(b.begin(), b.end(), lte),     &b[2]);
-  BOOST_TEST_EQ(*IS_SORTED_UNTIL(b.rbegin(), b.rend(), gt),   *b.rend());
+  BOOST_TEST_EQ(IS_SORTED_UNTIL(b.rbegin(), b.rend(), gt).base(),
+          b.rend().base());
   BOOST_TEST_EQ(*IS_SORTED_UNTIL(b.rbegin(), b.rend(), gte),  b[2]);
   
   BOOST_TEST_EQ(IS_SORTED(b.begin(), b.end()),        true); 
