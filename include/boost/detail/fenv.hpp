@@ -61,7 +61,35 @@
     using ::feholdexcept;
   } }
 
+#elif defined(__MINGW32__) && defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 408
+
+  // MinGW (32-bit) has a bug in mingw32/bits/c++config.h, it does not define _GLIBCXX_HAVE_FENV_H,
+  // which prevents the C fenv.h header contents to be included in the C++ wrapper header fenv.h. This is at least
+  // the case with gcc 4.8.1 packages tested so far, up to 4.8.1-4. Note that there is no issue with
+  // MinGW-w64.
+  // To work around the bug we avoid including the C++ wrapper header and include the C header directly
+  // and import all relevant symbols into std:: ourselves.
+
+  #include <../include/fenv.h>
+
+  namespace std {
+    using ::fenv_t;
+    using ::fexcept_t;
+    using ::fegetexceptflag;
+    using ::fesetexceptflag;
+    using ::feclearexcept;
+    using ::feraiseexcept;
+    using ::fetestexcept;
+    using ::fegetround;
+    using ::fesetround;
+    using ::fegetenv;
+    using ::fesetenv;
+    using ::feupdateenv;
+    using ::feholdexcept;
+  }
+
 #else /* if we're not using GNU's C stdlib, fenv.h should work with clang */
+
   #if defined(__SUNPRO_CC) /* lol suncc */
     #include <stdio.h>
   #endif
