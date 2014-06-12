@@ -14,7 +14,7 @@
 #if !defined(BOOST_DETAIL_FENV_HPP)
 #define BOOST_DETAIL_FENV_HPP
 
-/* If we're using clang + glibc, we have to get hacky. 
+/* If we're using clang + glibc, we have to get hacky.
  * See http://llvm.org/bugs/show_bug.cgi?id=6907 */
 #if defined(__clang__)       &&  (__clang_major__ < 3) &&    \
     defined(__GNU_LIBRARY__) && /* up to version 5 */ \
@@ -93,10 +93,9 @@
   #if defined(__SUNPRO_CC) /* lol suncc */
     #include <stdio.h>
   #endif
-  
+
   #include <fenv.h>
 
 #endif
 
 #endif /* BOOST_DETAIL_FENV_HPP */
- 
