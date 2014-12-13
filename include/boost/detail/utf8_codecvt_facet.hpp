@@ -93,12 +93,6 @@ namespace std {
 }
 #endif
 
-#if defined(_CPPLIB_VER) && (_CPPLIB_VER < 540)
-    #define BOOST_CODECVT_DO_LENGTH_CONST const
-#else
-    #define BOOST_CODECVT_DO_LENGTH_CONST
-#endif
-
 // maximum lenght of a multibyte string
 #define MB_LENGTH_MAX 8
 
@@ -183,7 +177,7 @@ protected:
     // How many char objects can I process to get <= max_limit
     // wchar_t objects?
     virtual int do_length(
-        BOOST_CODECVT_DO_LENGTH_CONST std::mbstate_t &,
+        const std::mbstate_t &,
         const char * from,
         const char * from_end, 
         std::size_t max_limit
@@ -192,7 +186,23 @@ protected:
     throw()
 #endif
     ;
-
+    virtual int do_length(
+        std::mbstate_t & s,
+        const char * from,
+        const char * from_end, 
+        std::size_t max_limit
+    ) const
+#if BOOST_WORKAROUND(__IBMCPP__, BOOST_TESTED_AT(600))
+    throw()
+#endif
+    {
+        return do_length(
+            const_cast<const std::mbstate_t &>(s),
+            from,
+            from_end,
+            max_limit
+        );
+    }
     // Largest possible value do_length(state,from,from_end,1) could return.
     virtual int do_max_length() const BOOST_NOEXCEPT_OR_NOTHROW {
         return 6; // largest UTF-8 encoding of a UCS-4 character
