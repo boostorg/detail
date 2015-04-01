@@ -4,14 +4,11 @@
 #ifndef IS_INCREMENTABLE_DWA200415_HPP
 # define IS_INCREMENTABLE_DWA200415_HPP
 
-# include <boost/type_traits/detail/template_arity_spec.hpp>
+# include <boost/type_traits/integral_constant.hpp>
 # include <boost/type_traits/remove_cv.hpp>
 # include <boost/mpl/aux_/lambda_support.hpp>
 # include <boost/mpl/bool.hpp>
 # include <boost/detail/workaround.hpp>
-
-// Must be the last include
-# include <boost/type_traits/detail/bool_trait_def.hpp>
 
 namespace boost { namespace detail { 
 
@@ -107,24 +104,19 @@ namespace is_incrementable_
 
 template<typename T> 
 struct is_incrementable 
-BOOST_TT_AUX_BOOL_C_BASE(::boost::detail::is_incrementable_::impl<T>::value)
+: public ::boost::integral_constant<bool,::boost::detail::is_incrementable_::impl<T>::value>
 { 
-    BOOST_TT_AUX_BOOL_TRAIT_VALUE_DECL(::boost::detail::is_incrementable_::impl<T>::value)
     BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_incrementable,(T))
 };
 
 template<typename T> 
 struct is_postfix_incrementable 
-BOOST_TT_AUX_BOOL_C_BASE(::boost::detail::is_incrementable_::postfix_impl<T>::value)
+: public ::boost::integral_constant<bool,::boost::detail::is_incrementable_::postfix_impl<T>::value>
 { 
-    BOOST_TT_AUX_BOOL_TRAIT_VALUE_DECL(::boost::detail::is_incrementable_::postfix_impl<T>::value)
     BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_postfix_incrementable,(T))
 };
 
 } // namespace detail
-
-BOOST_TT_AUX_TEMPLATE_ARITY_SPEC(1, ::boost::detail::is_incrementable)
-BOOST_TT_AUX_TEMPLATE_ARITY_SPEC(1, ::boost::detail::is_postfix_incrementable)
 
 } // namespace boost
 
