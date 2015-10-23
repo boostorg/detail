@@ -106,11 +106,11 @@ BOOST_UTF8_BEGIN_NAMESPACE
 //----------------------------------------------------------------------------//
 
 
-struct BOOST_UTF8_DECL utf8_codecvt_facet :
+struct  utf8_codecvt_facet :
     public std::codecvt<wchar_t, char, std::mbstate_t>  
 {
 public:
-    explicit utf8_codecvt_facet(std::size_t no_locale_manage=0)
+    BOOST_UTF8_DECL explicit utf8_codecvt_facet(std::size_t no_locale_manage=0)
         : std::codecvt<wchar_t, char, std::mbstate_t>(no_locale_manage) 
     {}
     virtual  ~utf8_codecvt_facet(){}
