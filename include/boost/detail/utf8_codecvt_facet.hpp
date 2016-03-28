@@ -105,6 +105,12 @@ BOOST_UTF8_BEGIN_NAMESPACE
 //            See utf8_codecvt_facet.ipp for the implementation.              //
 //----------------------------------------------------------------------------//
 
+#ifndef BOOST_UTF8_DECL
+#define BOOST_UTF8_DECL
+#endif
+#ifndef BOOST_SYMBOL_VISIBLE
+#define BOOST_SYMBOL_VISIBLE
+#endif
 
 struct  BOOST_SYMBOL_VISIBLE utf8_codecvt_facet :
     public std::codecvt<wchar_t, char, std::mbstate_t>  
