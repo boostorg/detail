@@ -109,7 +109,7 @@ BOOST_UTF8_BEGIN_NAMESPACE
 #define BOOST_UTF8_DECL
 #endif
 
-struct  BOOST_UTF8_DECL utf8_codecvt_facet :
+struct BOOST_SYMBOL_VISIBLE utf8_codecvt_facet :
     public std::codecvt<wchar_t, char, std::mbstate_t>  
 {
 public:
