@@ -30,6 +30,12 @@ BOOST_UTF8_BEGIN_NAMESPACE
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // implementation for wchar_t
 
+BOOST_UTF8_DECL utf8_codecvt_facet::utf8_codecvt_facet(
+    std::size_t no_locale_manage
+) :
+    std::codecvt<wchar_t, char, std::mbstate_t>(no_locale_manage)
+{}
+
 // Translate incoming UTF-8 into UCS-4
 BOOST_UTF8_DECL std::codecvt_base::result utf8_codecvt_facet::do_in(
     std::mbstate_t& /*state*/, 
