@@ -11,7 +11,7 @@
         "Bryce Lelbach",
         "Joaquin M Lopez Munoz",
         "Jeremy Siek",
-        "Matthias Troyerk",
+        "Matthias Troyerk"
     ],
     "description": "This library contains a set of header only utilities used internally by Boost C++ Libraries to facilitate their implementation.",
     "category": [
