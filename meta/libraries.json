@@ -1,6 +1,7 @@
 {
     "key": "detail",
     "name": "Detail",
+    "status": "hidden",
     "authors": [
         "David Abrahams",
         "Beman Dawes",
