@@ -204,7 +204,7 @@ BOOST_UTF8_DECL int utf8_codecvt_facet::do_length(
         last_octet_count = (get_octet_count(*from_next));
         ++char_count;
     }
-    return static_cast<int>(from_next-from_end);
+    return static_cast<int>(from_next-from);
 }
 
 BOOST_UTF8_DECL unsigned int utf8_codecvt_facet::get_octet_count(
