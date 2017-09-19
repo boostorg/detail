@@ -17,17 +17,18 @@
 
 #include <boost/detail/numeric_traits.hpp>
 #include <cassert>
-#include <boost/type_traits.hpp>
+#include <boost/type_traits/conditional.hpp>
+#include <boost/type_traits/is_signed.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/utility.hpp>
-#include <boost/lexical_cast.hpp>
 #include <climits>
 #include <typeinfo>
 #include <iostream>
+#include <sstream>
 #include <string>
 #ifndef BOOST_NO_LIMITS
-# include <limits>
+#include <limits>
 #endif
 
 // =================================================================================
@@ -42,7 +43,7 @@ template <unsigned size> struct complement; // forward
 
 // The template complement, below, does all the real work, using "poor man's
 // partial specialization". We need complement_traits_aux<> so that MSVC doesn't
-// complain about undefined min/max as we're trying to recursively define them. 
+// complain about undefined min/max as we're trying to recursively define them.
 template <class Number, unsigned size>
 struct complement_traits_aux
 {
@@ -109,7 +110,7 @@ struct complement<1>
     template <class Number>
     struct traits
     {
-        BOOST_STATIC_CONSTANT(bool, is_signed = boost::detail::is_signed<Number>::value);
+        BOOST_STATIC_CONSTANT(bool, is_signed = boost::is_signed<Number>::value);
         BOOST_STATIC_CONSTANT(Number, min =
                             complement_base<is_signed>::template values<Number>::min);
         BOOST_STATIC_CONSTANT(Number, max =
@@ -184,21 +185,30 @@ template <> struct promote<boost::uintmax_t> {
     std::string static from(const boost::uintmax_t x) {
         if (x > ULONG_MAX)
             return std::string("large unsigned value");
-        else
-            return boost::lexical_cast<std::string>((unsigned long)x);
+        else {
+            std::ostringstream strm;
+            strm << (unsigned long)x;
+            return strm.str();
+        }
     }
 };
 template <> struct promote<boost::intmax_t> {
     std::string static from(const boost::intmax_t x) {
         if (x > boost::intmax_t(ULONG_MAX))
             return std::string("large positive signed value");
-        else if (x >= 0)
-            return boost::lexical_cast<std::string>((unsigned long)x);
-        
+        else if (x >= 0) {
+            std::ostringstream strm;
+            strm << (unsigned long)x;
+            return strm.str();
+        }
+
         if (x < boost::intmax_t(LONG_MIN))
             return std::string("large negative signed value");
-        else
-            return boost::lexical_cast<std::string>((long)x);
+        else {
+            std::ostringstream strm;
+            strm << (long)x;
+            return strm.str();
+        }
     }
 };
 #endif
@@ -225,7 +235,7 @@ template <class Number>
 void test_aux(unsigned_tag, Number*)
 {
     typedef typename boost::detail::numeric_traits<Number>::difference_type difference_type;
-    BOOST_STATIC_ASSERT(!boost::detail::is_signed<Number>::value);
+    BOOST_STATIC_ASSERT(!boost::is_signed<Number>::value);
     BOOST_STATIC_ASSERT(
         (sizeof(Number) < sizeof(boost::intmax_t))
         | (boost::is_same<difference_type, boost::intmax_t>::value));
@@ -242,7 +252,7 @@ void test_aux(unsigned_tag, Number*)
 
     const Number max = complement_traits<Number>::max;
     const Number min = complement_traits<Number>::min;
-    
+
     const Number test_max = (sizeof(Number) < sizeof(boost::intmax_t))
         ? max
         : max / 2 - 1;
@@ -251,10 +261,10 @@ void test_aux(unsigned_tag, Number*)
               << stream_number(max) << "..." << std::flush;
     std::cout << "difference_type = " << typeid(difference_type).name() << "..."
               << std::flush;
-    
+
     difference_type d1 = boost::detail::numeric_distance(Number(0), test_max);
     difference_type d2 = boost::detail::numeric_distance(test_max, Number(0));
-    
+
     std::cout << "0->" << stream_number(test_max) << "==" << std::dec << stream_number(d1) << "; "
               << std::hex << stream_number(test_max) << "->0==" << std::dec << stream_number(d2) << "..." << std::flush;
 
@@ -272,11 +282,11 @@ struct in_range_tag {};
 template <class Number>
 void signed_test(in_range_tag, Number*)
 {
-    BOOST_STATIC_ASSERT(boost::detail::is_signed<Number>::value);
+    BOOST_STATIC_ASSERT(boost::is_signed<Number>::value);
     typedef typename boost::detail::numeric_traits<Number>::difference_type difference_type;
     const Number max = complement_traits<Number>::max;
     const Number min = complement_traits<Number>::min;
-    
+
     difference_type d1 = boost::detail::numeric_distance(min, max);
     difference_type d2 = boost::detail::numeric_distance(max, min);
 
@@ -293,7 +303,7 @@ void signed_test(in_range_tag, Number*)
 template <class Number>
 void signed_test(out_of_range_tag, Number*)
 {
-    BOOST_STATIC_ASSERT(boost::detail::is_signed<Number>::value);
+    BOOST_STATIC_ASSERT(boost::is_signed<Number>::value);
     typedef typename boost::detail::numeric_traits<Number>::difference_type difference_type;
     const Number max = complement_traits<Number>::max;
     const Number min = complement_traits<Number>::min;
@@ -318,7 +328,7 @@ template <class Number>
 void test_aux(signed_tag, Number*)
 {
     typedef typename boost::detail::numeric_traits<Number>::difference_type difference_type;
-    BOOST_STATIC_ASSERT(boost::detail::is_signed<Number>::value);
+    BOOST_STATIC_ASSERT(boost::is_signed<Number>::value);
     BOOST_STATIC_ASSERT(
         (sizeof(Number) < sizeof(boost::intmax_t))
         | (boost::is_same<difference_type, Number>::value));
@@ -331,22 +341,20 @@ void test_aux(signed_tag, Number*)
     // Force casting to Number here to work around the fact that it's an enum on MSVC
     BOOST_STATIC_ASSERT(Number(complement_traits<Number>::max) > Number(0));
     BOOST_STATIC_ASSERT(Number(complement_traits<Number>::min) < Number(0));
-#endif    
+#endif
     const Number max = complement_traits<Number>::max;
     const Number min = complement_traits<Number>::min;
-    
+
     std::cout << std::hex << "min = " << stream_number(min) << ", max = "
               << stream_number(max) << "..." << std::flush;
     std::cout << "difference_type = " << typeid(difference_type).name() << "..."
               << std::flush;
 
-    typedef typename boost::detail::if_true<
-                          (sizeof(Number) < sizeof(boost::intmax_t))>
-                        ::template then<
-                          in_range_tag,
-                          out_of_range_tag
-                        >::type
-        range_tag;
+    typedef typename boost::conditional<
+        (sizeof(Number) < sizeof(boost::intmax_t)),
+        in_range_tag,
+        out_of_range_tag
+    >::type range_tag;
     signed_test<Number>(range_tag(), 0);
 }
 
@@ -365,7 +373,7 @@ void test(Number* = 0)
               << "..." << std::flush;
 
     // factoring out difference_type for the assert below confused Borland :(
-    typedef boost::detail::is_signed<
+    typedef boost::is_signed<
 #if !defined(BOOST_MSVC) || BOOST_MSVC > 1300
         typename
 #endif
@@ -373,10 +381,12 @@ void test(Number* = 0)
         > is_signed;
     BOOST_STATIC_ASSERT(is_signed::value);
 
-    typedef typename boost::detail::if_true<
-        boost::detail::is_signed<Number>::value
-        >::template then<signed_tag, unsigned_tag>::type signedness;
-    
+    typedef typename boost::conditional<
+        boost::is_signed<Number>::value,
+        signed_tag,
+        unsigned_tag
+    >::type signedness;
+
     test_aux<Number>(signedness(), 0);
     std::cout << "passed" << std::endl;
 }
