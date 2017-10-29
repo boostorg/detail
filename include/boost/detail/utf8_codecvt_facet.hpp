@@ -188,7 +188,7 @@ protected:
     throw()
 #endif
     ;
-/*
+
     virtual int do_length(
         std::mbstate_t & s,
         const char * from,
@@ -206,7 +206,7 @@ protected:
             max_limit
         );
     }
-*/
+
     // Largest possible value do_length(state,from,from_end,1) could return.
     virtual int do_max_length() const BOOST_NOEXCEPT_OR_NOTHROW {
         return 6; // largest UTF-8 encoding of a UCS-4 character
