@@ -121,8 +121,13 @@ struct rebinder
   template<typename Type>
   struct result
   {
+#ifdef BOOST_NO_CXX11_ALLOCATOR
       typedef typename Allocator::BOOST_NESTED_TEMPLATE 
           rebind<Type>::other other;
+#else
+      typedef typename std::allocator_traits<Allocator>::BOOST_NESTED_TEMPLATE 
+          rebind_alloc<Type> other;
+#endif
   };
 };
 
