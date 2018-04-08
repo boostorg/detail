@@ -20,8 +20,6 @@
 # include <boost/detail/workaround.hpp>
 # include <boost/detail/select_type.hpp>
 
-# include <boost/mpl/aux_/lambda_support.hpp>
-
 
 namespace boost { namespace detail {
 
@@ -82,7 +80,6 @@ template <class T>
 struct is_reference_to_member_function_pointer
     : is_reference_to_member_function_pointer_impl<T>
 {
-    BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_reference_to_member_function_pointer,(T))
 };
 
 template <class T>
@@ -173,7 +170,6 @@ struct is_reference_to_class
           >::value
       >
 {
-    BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_reference_to_class,(T))
 };
 
 template <class T>
@@ -187,7 +183,6 @@ struct is_pointer_to_class
           >::value
       >
 {
-    BOOST_MPL_AUX_LAMBDA_SUPPORT(1,is_pointer_to_class,(T))
 };
 
 
