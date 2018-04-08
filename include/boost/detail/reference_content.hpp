@@ -15,7 +15,7 @@
 
 #include "boost/config.hpp"
 
-#   include "boost/mpl/bool.hpp"
+#   include "boost/type_traits/integral_constant.hpp"
 #   include "boost/type_traits/has_nothrow_copy.hpp"
 
 #include "boost/mpl/void.hpp"
@@ -110,7 +110,7 @@ template <typename T>
 struct has_nothrow_copy<
       ::boost::detail::reference_content< T& >
     >
-    : mpl::true_
+    : boost::true_type
 {
 };
 
