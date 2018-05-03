@@ -1,12 +1,10 @@
-# Copyright 2016, 2017 Peter Dimov
+# Copyright 2016, 2017, 2018 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 language: cpp
 
 sudo: false
-
-python: "2.7"
 
 branches:
   only:
@@ -27,6 +25,26 @@ matrix:
     - os: linux
       compiler: g++
       env: TOOLSET=gcc COMPILER=g++ CXXSTD=03,11
+
+    - os: linux
+      compiler: g++-4.4
+      env: TOOLSET=gcc COMPILER=g++-4.4 CXXSTD=98,0x
+      addons:
+        apt:
+          packages:
+            - g++-4.4
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      compiler: g++-4.6
+      env: TOOLSET=gcc COMPILER=g++-4.6 CXXSTD=03,0x
+      addons:
+        apt:
+          packages:
+            - g++-4.6
+          sources:
+            - ubuntu-toolchain-r-test
 
     - os: linux
       compiler: g++-4.7
@@ -78,7 +96,6 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      dist: trusty
       compiler: g++-7
       env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=03,11,14,17
       addons:
@@ -91,6 +108,22 @@ matrix:
     - os: linux
       compiler: clang++
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=03,11
+
+    - os: linux
+      compiler: /usr/bin/clang++
+      env: TOOLSET=clang COMPILER=/usr/bin/clang++ CXXSTD=03,11
+      addons:
+        apt:
+          packages:
+            - clang-3.3
+
+    - os: linux
+      compiler: /usr/bin/clang++
+      env: TOOLSET=clang COMPILER=/usr/bin/clang++ CXXSTD=03,11
+      addons:
+        apt:
+          packages:
+            - clang-3.4
 
     - os: linux
       compiler: clang++-3.5
@@ -171,6 +204,14 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
+
+    - os: linux
+      compiler: clang++-libc++
+      env: TOOLSET=clang COMPILER=clang++-libc++ CXXSTD=03,11,14,1z
+      addons:
+        apt:
+          packages:
+            - libc++-dev
 
     - os: osx
       compiler: clang++
