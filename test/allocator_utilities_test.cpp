@@ -8,9 +8,9 @@
 #include <cassert>
 
 typedef std::allocator<int> std_int_allocator;
-typedef typename boost::detail::allocator::rebind_to<std_int_allocator, char>::type char_allocator;
-typedef typename boost::detail::allocator::rebind_to<char_allocator, int>::type int_allocator;
-typedef typename boost::detail::allocator::rebind_to<int_allocator, char>::type char_allocator2;
+typedef boost::detail::allocator::rebind_to<std_int_allocator, char>::type char_allocator;
+typedef boost::detail::allocator::rebind_to<char_allocator, int>::type int_allocator;
+typedef boost::detail::allocator::rebind_to<int_allocator, char>::type char_allocator2;
 
 int main() {
     BOOST_STATIC_ASSERT((!boost::is_same<char_allocator, int_allocator>::value));
@@ -24,14 +24,14 @@ int main() {
 
     // Check allocate works okay
     {
-        typename char_allocator::pointer p = a2.allocate(10);
+        char_allocator::pointer p = a2.allocate(10);
         assert(p);
         a2.deallocate(p, 10);
     }
 
     // Try using the standalone construct/destroy
     {
-        typename int_allocator::pointer p2 = a3.allocate(1);
+        int_allocator::pointer p2 = a3.allocate(1);
         boost::detail::allocator::construct(p2, 25);
         assert(*p2 == 25);
         boost::detail::allocator::destroy(p2);
