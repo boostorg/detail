@@ -26,7 +26,7 @@
 #include <boost/cstdlib.hpp>  // for exit codes
 #include <ostream>         // for ostream
 
-# if defined(__BORLANDC__) && (__BORLANDC__ <= 0x0551)
+# if defined(BOOST_BORLANDC) && (BOOST_BORLANDC <= 0x0551)
 #   define BOOST_BUILT_IN_EXCEPTIONS_MISSING_WHAT 
 # endif
 
