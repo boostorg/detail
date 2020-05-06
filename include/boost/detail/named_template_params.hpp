@@ -11,6 +11,7 @@
 #ifndef BOOST_DETAIL_NAMED_TEMPLATE_PARAMS_HPP
 #define BOOST_DETAIL_NAMED_TEMPLATE_PARAMS_HPP
 
+#include <boost/config.hpp>
 #include <boost/type_traits/conversion_traits.hpp>
 #include <boost/type_traits/composite_traits.hpp> // for is_reference
 #if defined(BOOST_BORLANDC)

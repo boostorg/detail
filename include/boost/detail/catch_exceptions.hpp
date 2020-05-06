@@ -18,6 +18,7 @@
 
 //  header dependencies are deliberately restricted to the standard library
 //  to reduce coupling to other boost libraries.
+#include <boost/config.hpp>
 #include <string>             // for string
 #include <new>                // for bad_alloc
 #include <typeinfo>           // for bad_cast, bad_typeid
@@ -26,7 +27,7 @@
 #include <boost/cstdlib.hpp>  // for exit codes
 #include <ostream>         // for ostream
 
-# if defined(__BORLANDC__) && !defined(__clang__) && (__BORLANDC__ <= 0x0551)
+# if defined(BOOST_BORLANDC) && (__BORLANDC__ <= 0x0551)
 #   define BOOST_BUILT_IN_EXCEPTIONS_MISSING_WHAT 
 # endif
 
