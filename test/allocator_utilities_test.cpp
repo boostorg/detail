@@ -5,6 +5,7 @@
 
 #include <boost/detail/allocator_utilities.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/core/allocator_access.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <memory>
@@ -27,14 +28,14 @@ int main()
 
     // Check allocate works okay
     {
-        char_allocator::pointer p = a2.allocate(10);
+        boost::allocator_pointer<char_allocator>::type p = a2.allocate(10);
         BOOST_TEST(!!p);
         a2.deallocate(p, 10);
     }
 
     // Try using the standalone construct/destroy
     {
-        int_allocator::pointer p2 = a3.allocate(1);
+        boost::allocator_pointer<int_allocator>::type p2 = a3.allocate(1);
         boost::detail::allocator::construct(p2, 25);
         BOOST_TEST(*p2 == 25);
         boost::detail::allocator::destroy(p2);
