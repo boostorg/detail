@@ -199,7 +199,9 @@ int utf8_codecvt_facet::do_length(
 
     for (; max_limit && from < from_end; --max_limit) {
         int next_octet_count = get_octet_count(*from);
-        if ((from += next_octet_count) <= from_end) {
+        from += next_octet_count;
+        
+        if (from <= from_end) {
             total_octet_count += next_octet_count;
         }
     }
