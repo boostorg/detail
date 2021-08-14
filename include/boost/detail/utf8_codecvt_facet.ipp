@@ -30,17 +30,17 @@ BOOST_UTF8_BEGIN_NAMESPACE
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // implementation for wchar_t
 
-utf8_codecvt_facet::utf8_codecvt_facet(
+BOOST_UTF8_DECL utf8_codecvt_facet::utf8_codecvt_facet(
     std::size_t no_locale_manage
 ) :
     std::codecvt<wchar_t, char, std::mbstate_t>(no_locale_manage)
 {}
 
-utf8_codecvt_facet::~utf8_codecvt_facet()
+BOOST_UTF8_DECL utf8_codecvt_facet::~utf8_codecvt_facet()
 {}
 
 // Translate incoming UTF-8 into UCS-4
-std::codecvt_base::result utf8_codecvt_facet::do_in(
+BOOST_UTF8_DECL std::codecvt_base::result utf8_codecvt_facet::do_in(
     std::mbstate_t& /*state*/, 
     const char * from,
     const char * from_end, 
@@ -117,7 +117,7 @@ std::codecvt_base::result utf8_codecvt_facet::do_in(
     else return std::codecvt_base::partial;
 }
 
-std::codecvt_base::result utf8_codecvt_facet::do_out(
+BOOST_UTF8_DECL std::codecvt_base::result utf8_codecvt_facet::do_out(
     std::mbstate_t& /*state*/, 
     const wchar_t *   from,
     const wchar_t * from_end, 
@@ -179,7 +179,7 @@ std::codecvt_base::result utf8_codecvt_facet::do_out(
 
 // How many char objects can I process to get <= max_limit
 // wchar_t objects?
-int utf8_codecvt_facet::do_length(
+BOOST_UTF8_DECL int utf8_codecvt_facet::do_length(
     std::mbstate_t &,
     const char * from,
     const char * from_end, 
@@ -210,7 +210,7 @@ int utf8_codecvt_facet::do_length(
     return static_cast<int>(from_next-from);
 }
 
-unsigned int utf8_codecvt_facet::get_octet_count(
+BOOST_UTF8_DECL unsigned int utf8_codecvt_facet::get_octet_count(
     unsigned char lead_octet
 ){
     // if the 0-bit (MSB) is 0, then 1 character
@@ -229,7 +229,7 @@ unsigned int utf8_codecvt_facet::get_octet_count(
 namespace detail {
 
 template<std::size_t s>
-int get_cont_octet_out_count_impl(wchar_t word){
+BOOST_UTF8_DECL int get_cont_octet_out_count_impl(wchar_t word){
     if (word < 0x80) {
         return 0;
     }
@@ -240,7 +240,7 @@ int get_cont_octet_out_count_impl(wchar_t word){
 }
 
 template<>
-int get_cont_octet_out_count_impl<4>(wchar_t word){
+BOOST_UTF8_DECL int get_cont_octet_out_count_impl<4>(wchar_t word){
     if (word < 0x80) {
         return 0;
     }
@@ -282,7 +282,7 @@ int get_cont_octet_out_count_impl<4>(wchar_t word){
 
 // How many "continuing octets" will be needed for this word
 // ==   total octets - 1.
-int utf8_codecvt_facet::get_cont_octet_out_count(
+BOOST_UTF8_DECL int utf8_codecvt_facet::get_cont_octet_out_count(
     wchar_t word
 ) const {
     return detail::get_cont_octet_out_count_impl<sizeof(wchar_t)>(word);
