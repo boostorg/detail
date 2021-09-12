@@ -192,11 +192,11 @@ test_main(int /* argc */, char * /* argv */[]) {
         std::vector<utf8_t> data2;
         std::copy(it2, end_iter, std::back_inserter(data2));
 
-        BOOST_TEST(data1 == data2);
+        BOOST_TEST_ALL_EQ(data1.begin(), data1.end(), data2.begin(), data2.end());
     }
 
     // some libraries have trouble that only shows up with longer strings
-    
+
     const wchar_t * test3_data = L"\
     <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\
     <!DOCTYPE boost_serialization>\
@@ -224,7 +224,7 @@ test_main(int /* argc */, char * /* argv */[]) {
     </a>\
     </boost_serialization>\
     ";
-    
+
     // Send the UCS4_data back out, converting to UTF-8
     std::size_t l = std::wcslen(test3_data);
     {
@@ -299,4 +299,3 @@ main(int argc, char * argv[]){
         retval = error_count;
     return retval;
 }
-
