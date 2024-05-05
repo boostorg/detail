@@ -21,6 +21,7 @@ project detail/test
   ;
 
 # import rules for testing conditional on config file variables
+import-search /boost/config/checks ;
 import config : requires ;
 
 run binary_search_test.cpp ;
