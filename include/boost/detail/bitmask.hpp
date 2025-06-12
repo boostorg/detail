@@ -83,6 +83,7 @@ using underlying_type_t = typename std::underlying_type< Enum >::type;
   inline BOOST_CONSTEXPR bool operator!(Bitmask x) BOOST_NOEXCEPT                                               \
   { return !static_cast< ::boost::detail::bitmask::underlying_type_t< Bitmask > >(x); }                         \
                                                                                                                 \
+  BOOST_DEPRECATED("bitmask_set(enum) is deprecated, use !!enum or comparison operators instead")               \
   inline BOOST_CONSTEXPR bool bitmask_set(Bitmask x) BOOST_NOEXCEPT                                             \
   { return !!x; }
 
