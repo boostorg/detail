@@ -26,7 +26,8 @@
 #endif
 #endif
 
-#if !defined(BOOST_BITMASK_DETAIL_UNDERLYING_TYPE) && defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION >= 40700)
+#if !defined(BOOST_BITMASK_DETAIL_UNDERLYING_TYPE) && \
+    ((defined(BOOST_GCC_VERSION) && (BOOST_GCC_VERSION >= 40700)) || (defined(_MSC_VER) && (_MSC_VER >= 1700)))
 #define BOOST_BITMASK_DETAIL_UNDERLYING_TYPE(enum_type) __underlying_type(enum_type)
 #endif
 
